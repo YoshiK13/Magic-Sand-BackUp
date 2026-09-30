@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y \
     sudo \
     fuse \
     file \
+    imagemagick \
     software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
@@ -94,7 +95,7 @@ echo "Type=Application" >> AppDir/usr/share/applications/magicsand.desktop
 echo "Categories=Game;Education;" >> AppDir/usr/share/applications/magicsand.desktop
 
 # Create a dummy icon since we don't have a PNG readily available.
-touch AppDir/usr/share/icons/hicolor/256x256/apps/magicsand.png
+convert /workspace/icon.ico[0] AppDir/usr/share/icons/hicolor/256x256/apps/magicsand.png
 
 echo "Running linuxdeploy to gather dependencies..."
 # We use APPIMAGE_EXTRACT_AND_RUN=1 because FUSE is sometimes problematic in Docker
