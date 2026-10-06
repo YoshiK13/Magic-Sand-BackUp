@@ -40,6 +40,10 @@ RUN sudo ./install_dependencies.sh -y && \
 WORKDIR /opt/of/libs/openFrameworksCompiled/project
 RUN make -j$(nproc)
 
+# Patch ofxKinect to select only FREENECT_DEVICE_CAMERA
+# Kinect for Windows (K4W / Model 1473) fails when motor or audio are requested
+RUN sed -i 's/FREENECT_DEVICE_MOTOR | FREENECT_DEVICE_CAMERA/FREENECT_DEVICE_CAMERA/g' /opt/of/addons/ofxKinect/src/ofxKinect.cpp
+
 # Download addons required by Magic Sand
 WORKDIR /opt/of/addons
 RUN git clone -b stable https://github.com/kylemcdonald/ofxCv.git && \
@@ -69,6 +73,9 @@ export OF_ROOT=/opt/of
 
 # Clean any stale/partial object files from previous runs
 rm -rf obj
+
+# Patch ofxKinect to select only FREENECT_DEVICE_CAMERA (for existing images)
+sed -i 's/FREENECT_DEVICE_MOTOR | FREENECT_DEVICE_CAMERA/FREENECT_DEVICE_CAMERA/g' /opt/of/addons/ofxKinect/src/ofxKinect.cpp
 
 echo "Compiling Magic-Sand..."
 # Explicitly set APPNAME so openFrameworks outputs bin/Magic-Sand instead of bin/workspace
@@ -165,7 +172,7 @@ chmod +x AppDir/AppRun
 echo "Running appimagetool to create the final AppImage..."
 export APPIMAGE_EXTRACT_AND_RUN=1
 /opt/appimage/appimagetool-x86_64.AppImage AppDir Magic-Sand-x86_64.AppImage
-mv Magic-Sand-x86_64.AppImage /workspace/
+[ ! "Magic-Sand-x86_64.AppImage" -ef "/workspace/Magic-Sand-x86_64.AppImage" ] && mv Magic-Sand-x86_64.AppImage /workspace/ || true
 chmod 777 /workspace/Magic-Sand-x86_64.AppImage
 
 echo "AppImage created successfully!"

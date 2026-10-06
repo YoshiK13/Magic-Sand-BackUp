@@ -85,6 +85,8 @@ int main() {
 	settings.decorated = false;
 	settings.shareContextWith = mainWindow;
 	shared_ptr<ofAppBaseWindow> secondWindow = ofCreateWindow(settings);
+	secondWindow->setWindowPosition(settings.getPosition().x, settings.getPosition().y);
+	secondWindow->setWindowShape(settings.width, settings.height);
 	secondWindow->setVerticalSync(false);
 
 	shared_ptr<ofApp> mainApp(new ofApp);
